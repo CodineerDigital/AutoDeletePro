@@ -2,6 +2,6 @@
 {
     class Configuration
     {
-        public bool HologramEnabled { get; set; }
+        public int TimeToLive { get; set; }
     }
 }

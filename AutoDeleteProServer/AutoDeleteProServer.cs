@@ -1,9 +1,9 @@
-﻿using System;
+﻿using CitizenFX.Core;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using CitizenFX.Core;
 using static CitizenFX.Core.Native.API;
 
 namespace AutoDeleteProServer
@@ -11,6 +11,7 @@ namespace AutoDeleteProServer
     public class AutoDeleteProServer : BaseScript
     {
         private Dictionary<int, int> vehicleList = new Dictionary<int, int>();
+        private readonly Configuration config = JsonConvert.DeserializeObject<Configuration>(LoadResourceFile(GetCurrentResourceName(), "config.json"));
 
         public AutoDeleteProServer()
         {
@@ -21,7 +22,7 @@ namespace AutoDeleteProServer
 
         private void TouchVehicle([FromSource]Player source, int netId)
         {
-            vehicleList[netId] = AutoDeleteProShared.Utils.getCurrentEpoch();
+            vehicleList[netId] = AutoDeleteProShared.Utils.getCurrentEpoch() + config.TimeToLive;
         }
 
         private async Task VehicleCleanup()
