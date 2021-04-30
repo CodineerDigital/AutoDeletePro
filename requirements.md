@@ -1,4 +1,4 @@
-#AutoDeletePro
+# AutoDeletePro
 
 ## Short Description:
 AutoDeletePro is a small script which ensures that cars or vehicles are deleted after a certain time.
