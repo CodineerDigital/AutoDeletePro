@@ -12,6 +12,7 @@ namespace AutoDeleteProClient
     public class AutoDeleteProClient : BaseScript
     {
         private Dictionary<int, int> vehicleCache = new Dictionary<int, int>();
+        private List<int> blacklist = new List<int>();
         private readonly Configuration config = JsonConvert.DeserializeObject<Configuration>(LoadResourceFile(GetCurrentResourceName(), "config.json"));
         private Vehicle lastVehicle = null;
         private int lastUpdate;
@@ -22,6 +23,12 @@ namespace AutoDeleteProClient
 
             EventHandlers["AutoDeletePro:DeleteVehicle"] += new Action<int>(DeleteVehicle);
             EventHandlers["AutoDeletePro:CacheUpdate"] += new Action<string>(CacheUpdate);
+
+            // Create cache of hashes
+            foreach(string model in config.Blacklist)
+            {
+                blacklist.Add(GetHashKey(model));
+            }
 
             if (config.HologramEnabled)
             {
@@ -35,15 +42,24 @@ namespace AutoDeleteProClient
             await Delay(0);
             if (Game.PlayerPed.IsInVehicle() && lastVehicle != Game.PlayerPed.CurrentVehicle)
             {
-                DebugLog("In vehicle and last vehicle doesn't match, updating, vehicle: " + Game.PlayerPed.CurrentVehicle.NetworkId);
-                lastVehicle = Game.PlayerPed.CurrentVehicle;
-                TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId);
-                lastUpdate = Game.GameTime;
+                if (!IsBlacklisted(Game.PlayerPed.CurrentVehicle))
+                {
+                    DebugLog("In vehicle and last vehicle doesn't match, updating, vehicle: " + Game.PlayerPed.CurrentVehicle.NetworkId);
+                    lastVehicle = Game.PlayerPed.CurrentVehicle;
+                    TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId);
+                    lastUpdate = Game.GameTime;
+                } else
+                {
+                    DebugLog("Player is in blacklisted vehicle.");
+                }
             }
             else if (!Game.PlayerPed.IsInVehicle() && lastVehicle != null)
             {
-                DebugLog("No longer in vehicle, touching last vehicle: " + lastVehicle.NetworkId);
-                TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId);
+                if (lastVehicle.Exists())
+                {
+                    DebugLog("No longer in vehicle, touching last vehicle: " + lastVehicle.NetworkId);
+                    TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId);
+                }
                 lastVehicle = null;
             }
             else
@@ -86,6 +102,15 @@ namespace AutoDeleteProClient
                     }
                 }
             }
+        }
+
+        private bool IsBlacklisted(Vehicle vehicle)
+        {
+            if (blacklist.Contains(vehicle.Model.Hash))
+            {
+                return true;
+            }
+            return false;
         }
 
         private string PrettifyTime(int deletion)
