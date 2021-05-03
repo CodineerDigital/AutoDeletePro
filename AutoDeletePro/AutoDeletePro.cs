@@ -46,7 +46,7 @@ namespace AutoDeleteProClient
                 {
                     DebugLog("In vehicle and last vehicle doesn't match, updating, vehicle: " + Game.PlayerPed.CurrentVehicle.NetworkId);
                     lastVehicle = Game.PlayerPed.CurrentVehicle;
-                    TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId);
+                    TriggerServerEvent("AutoDeletePro:TouchVehicle", Game.PlayerPed.CurrentVehicle.NetworkId, Game.PlayerPed.CurrentVehicle.Model.Hash);
                     lastUpdate = Game.GameTime;
                 } else
                 {
@@ -58,7 +58,7 @@ namespace AutoDeleteProClient
                 if (lastVehicle.Exists())
                 {
                     DebugLog("No longer in vehicle, touching last vehicle: " + lastVehicle.NetworkId);
-                    TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId);
+                    TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId, lastVehicle.Model.Hash);
                 }
                 lastVehicle = null;
             }
@@ -67,7 +67,7 @@ namespace AutoDeleteProClient
                 if (lastVehicle != null && Game.GameTime > lastUpdate + config.TimeForUpdate * 1000)
                 {
                     DebugLog("Still in vehicle, touching it: " + lastVehicle.NetworkId);
-                    TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId);
+                    TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId, lastVehicle.Model.Hash);
                     lastUpdate = Game.GameTime;
                 }
             }
