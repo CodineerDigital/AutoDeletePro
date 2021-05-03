@@ -13,6 +13,7 @@ namespace AutoDeleteProShared
         public bool HologramVisibleInVehicle { get; set; }
         public float HologramDistance { get; set; }
         public int TimeToLive { get; set; }
+        public int TimeForUpdate { get; set; }
         public bool Debug { get; set; }
     }
 }

@@ -9,6 +9,7 @@
   "HologramDistance": 5.0,           // Distance to show hologram if key not configured
   "HologramVisibleInVehicle": false, // Show hologram while in vehicle?
   "TimeToLive": 60,                  // Time for a vehicle to be allowed to sit idle in seconds
+  "TimeForUpdate": 30,               // Number of seconds between updates (an approximate)
   "Debug": false                     // Shouldn't be exposed to consumers, but can be used to debug issues
 }
 ```

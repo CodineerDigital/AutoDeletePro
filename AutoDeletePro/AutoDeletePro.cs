@@ -48,7 +48,7 @@ namespace AutoDeleteProClient
             }
             else
             {
-                if (lastVehicle != null && Game.GameTime > lastUpdate + 30000)
+                if (lastVehicle != null && Game.GameTime > lastUpdate + config.TimeForUpdate * 1000)
                 {
                     DebugLog("Still in vehicle, touching it: " + lastVehicle.NetworkId);
                     TriggerServerEvent("AutoDeletePro:TouchVehicle", lastVehicle.NetworkId);
