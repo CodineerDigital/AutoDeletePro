@@ -44,6 +44,7 @@ namespace AutoDeleteProServer
 
                 Tick += VehicleCleanup;
                 Tick += CacheBroadcast;
+                Log("Startup Complete.");
             }
         }
 
