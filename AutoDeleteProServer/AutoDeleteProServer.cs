@@ -78,7 +78,7 @@ namespace AutoDeleteProServer
                 {
                     Entity v = Entity.FromNetworkId(vehicleList.Keys.ElementAt(i));
 
-                    if (v != null || !DoesEntityExist(v.Handle))
+                    if (v == null || !DoesEntityExist(v.Handle))
                     {
                         vehicleList.Remove(vehicleList.Keys.ElementAt(i));
                     }
