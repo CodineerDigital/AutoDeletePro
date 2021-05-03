@@ -18,37 +18,55 @@ namespace AutoDeleteProServer
 
         public AutoDeleteProServer()
         {
-            DebugLog("Starting AutoDeletePro");
-            EventHandlers["AutoDeletePro:TouchVehicle"] += new Action<Player, int>(TouchVehicle);
-            EventHandlers["entityRemoved"] += new Action<int>(EntityRemoved);
-
-            foreach(KeyValuePair<string, int> entry in config.Custom)
+            Log("Starting script...");
+            if (GetConvar("onesync", "off") != "on")
             {
-                customTimes[GetHashKey(entry.Key)] = entry.Value;
+                Log("This script requires use of OneSync Infinity. Please ensure you are using OneSync Infinity and try again.");
             }
-
-            foreach(string model in config.Blacklist)
+            else
             {
-                blacklist.Add(GetHashKey(model));
-            }
+                EventHandlers["AutoDeletePro:TouchVehicle"] += new Action<Player, int, int>(TouchVehicle);
+                EventHandlers["entityRemoved"] += new Action<int>(EntityRemoved);
 
-            Tick += VehicleCleanup;
-            Tick += CacheBroadcast;
+                DebugLog("[AutoDeletePro] Building Custom Times.");
+                foreach (KeyValuePair<string, int> entry in config.Custom)
+                {
+                    customTimes[GetHashKey(entry.Key)] = entry.Value;
+                }
+
+                DebugLog("[AutoDeletePro] Building Blacklist");
+                foreach (string model in config.Blacklist)
+                {
+                    blacklist.Add(GetHashKey(model));
+                }
+
+                DebugLog("Done.");
+
+                Tick += VehicleCleanup;
+                Tick += CacheBroadcast;
+                Log("Startup Complete.");
+            }
         }
 
-        private void TouchVehicle([FromSource]Player source, int netId)
+        private void TouchVehicle([FromSource]Player source, int netId, int hash)
         {
+            DebugLog("TouchVehicle " + netId + ", hash: " + hash + " from existing " + JsonConvert.SerializeObject(vehicleList));
             Entity e = Entity.FromNetworkId(netId);
-
-            if (!blacklist.Contains(e.Model.GetHashCode()))
+            DebugLog("Checking blacklist");
+            if (!blacklist.Contains(hash))
             {
-                if (customTimes.ContainsKey(e.Model.GetHashCode()))
+                DebugLog("Vehicle is not blacklisted");
+                if (customTimes.ContainsKey(hash))
                 {
-                    vehicleList[netId] = Utils.getCurrentEpoch() + customTimes[e.Model.GetHashCode()];
+                    DebugLog("Setting custom time");
+                    vehicleList[netId] = Utils.getCurrentEpoch() + customTimes[hash];
+                    DebugLog("Time set.");
                 }
                 else
                 {
+                    DebugLog("Setting standard time");
                     vehicleList[netId] = Utils.getCurrentEpoch() + config.TimeToLive;
+                    DebugLog("Time set2.");
                 }
                 DebugLog("Touching vehicle " + netId + ", new TTL " + vehicleList[netId]);
             } else
@@ -74,21 +92,30 @@ namespace AutoDeleteProServer
 
             for (int i = 0; i < vehicleList.Count; i++)
             {
-                if (now >= vehicleList[vehicleList.Keys.ElementAt(i)])
+                DebugLog("VehicleCleanup: " + i + " of " + vehicleList.Count);
+                int key = vehicleList.Keys.ElementAt(i);
+                DebugLog("Setting key " + key);
+                if (now >= vehicleList[key])
                 {
-                    Entity v = Entity.FromNetworkId(vehicleList.Keys.ElementAt(i));
+                    DebugLog("Now is past.");
+                    Entity v = Entity.FromNetworkId(key);
+                    DebugLog("Entity: " + v?.Handle);
 
-                    if (v == null || !DoesEntityExist(v.Handle))
+                    if (v == null || (v != null && !DoesEntityExist(v.Handle)))
                     {
-                        vehicleList.Remove(vehicleList.Keys.ElementAt(i));
+                        DebugLog("Entity doesn't exist, removing from list.");
+                        vehicleList.Remove(key);
+                        DebugLog("Key removed1.");
                     }
                     else
                     {
-                        vehicleList.Remove(vehicleList.Keys.ElementAt(i));
+                        DebugLog("Entity is not null and does exist");
+                        vehicleList.Remove(key);
+                        DebugLog("Key removed.");
                         if (v?.Owner != null)
                         {
                             DebugLog("Sending event to delete vehicle " + v.NetworkId + " to: " + v.Owner.Handle);
-                            v.Owner.TriggerEvent("AutoDeletePro:DeleteVehicle", vehicleList.Keys.ElementAt(i));
+                            v.Owner.TriggerEvent("AutoDeletePro:DeleteVehicle", key);
                         }
                         else
                         {
@@ -108,9 +135,14 @@ namespace AutoDeleteProServer
             TriggerClientEvent("AutoDeletePro:CacheUpdate", JsonConvert.SerializeObject(vehicleList));
         }
 
+        private void Log(string text)
+        {
+            Debug.WriteLine("[AutoDeletePro] " + text);
+        }
+
         private void DebugLog(string text)
         {
-            if (config.Debug) Debug.WriteLine(text);
+            if (config.Debug) Log(text);
         }
     }
 }
