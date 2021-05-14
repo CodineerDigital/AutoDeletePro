@@ -1,6 +1,6 @@
 # AutoDeletePro
 
-AutoDeletePro adds a timer to vehicles for deletion. It is OneSync Infinity ready and works best in that environment but does work in non-OneSync environments as well.
+AutoDeletePro adds a timer to vehicles for deletion. It does require OneSync Infinity.
 
 ## Features
 * Configurable number of minutes until a vehicle is deleted after use
