@@ -18,6 +18,8 @@ will remain for 60 seconds with no one in them. Timer only begins when a player 
 
 Script can also handle a list of vehicles to never delete (blacklist), or apply custom times to specific vehicle models (custom).
 
+It is encouraged to not disclose the "Debug" configuration setting to consumers as it is very verbose, but is very useful during troubleshooting to pin-point the exact failure.  As such, the Debug option is ommitted from the below example but is referenced in the configuration markdown.
+
 Filename: config.json
 
 ```json
@@ -38,9 +40,10 @@ Filename: config.json
 
 ## External Script Integration
 
-A vehicle's "last used" time can be touched by external scripts by triggering an event called AutoDeletePro:TouchVehicle with the network ID as an argument.
+A vehicle's "last used" time can be touched by external scripts by triggering an event called AutoDeletePro:TouchVehicle with the network ID and model hash as arguments.
 
 Example:
 ```CSharp
-TriggerServerEvent("AutoDeletePro:TouchVehicle", NetworkGetNetworkIdFromEntity(vehicle))
+TriggerServerEvent("AutoDeletePro:TouchVehicle", NetworkGetNetworkIdFromEntity(vehicle), GetHashKey(GetEntityModel(vehicle)));
+TriggerServerEvent("AutoDeletePro:TouchVehicle", vehicle.NetworkId, vehicle.Hash);
 ```
