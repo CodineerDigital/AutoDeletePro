@@ -131,7 +131,7 @@ namespace AutoDeleteProServer
         {
             await BaseScript.Delay(10000);
 
-            Debug.WriteLine("Sending cache update: " + JsonConvert.SerializeObject(vehicleList));
+            DebugLog("Sending cache update: " + JsonConvert.SerializeObject(vehicleList));
             TriggerClientEvent("AutoDeletePro:CacheUpdate", JsonConvert.SerializeObject(vehicleList));
         }
 
