@@ -19,7 +19,7 @@ namespace AutoDeleteProServer
         public AutoDeleteProServer()
         {
             Log("Starting script...");
-            if (GetConvar("onesync_enableInfinity", "off") != "on")
+            if (GetConvar("onesync_enableInfinity", "off") != "on" && GetConvar("onesync", "off") != "on" && !config.SkipOneSyncCheck)
             {
                 Log("This script requires use of OneSync Infinity. Please ensure you are using OneSync Infinity and try again.");
             }

@@ -15,6 +15,7 @@ namespace AutoDeleteProShared
         public int TimeToLive { get; set; }
         public int TimeForUpdate { get; set; }
         public bool Debug { get; set; }
+        public bool SkipOneSyncCheck { get; set; }
         public List<string> Blacklist { get; set; }
         public Dictionary<string, int> Custom { get; set; }
     }
