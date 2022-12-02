@@ -1,12 +1,12 @@
 # AutoDeletePro
 
-## Short Description:
+## Short Description
 AutoDeletePro is a small script which ensures that cars or vehicles are deleted after a certain time.
 
-## Functionality:
+## Functionality
 The functionality is pretty simple, every vehicle on the map should be deleted after a certain, configurable time.
 
-## Feature List:
+## Feature List
 
 * Configurable number of minutes until a vehicle is deleted after use
 * Blacklist specific vehicles which are not being ever deleted
